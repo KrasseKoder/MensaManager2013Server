@@ -7,10 +7,32 @@ import com.trolltech.qt.core.QSettings;
 import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.network.QHostAddress;
 import com.trolltech.qt.network.QTcpServer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server extends QTcpServer {
+    
+    public static class InputThread extends Thread{
+        @Override
+        public void run() {
+            BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+            while(true) {
+                try {
+                    if(r.readLine().equals("stop")) {
+                        QCoreApplication.quit();
+                        return;
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
 
     public Server(QHostAddress address, int port) {
         newConnection.connect(this, "establishConnection()");
@@ -68,6 +90,8 @@ public class Server extends QTcpServer {
         Server s = new Server(new QHostAddress(settings.value("server-ip", "localhost").toString()),
                 Integer.parseInt(settings.value("server-port", "0").toString()));
 
-        //QCoreApplication.exec(); //No way of quitting
+        (new InputThread()).start();
+        
+        QCoreApplication.exec(); //No way of quitting
     }
 }
