@@ -1,10 +1,10 @@
 package com.github.krassekoder.mm13server;
 
+import com.trolltech.qt.QVariant;
 import com.trolltech.qt.core.QCoreApplication;
 import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QFile;
 import com.trolltech.qt.core.QSettings;
-import com.trolltech.qt.gui.QApplication;
 import com.trolltech.qt.network.QHostAddress;
 import com.trolltech.qt.network.QTcpServer;
 import java.io.BufferedReader;
@@ -16,14 +16,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server extends QTcpServer {
-    
-    public static class InputThread extends Thread{
+
+    public static class InputThread extends Thread {
         @Override
         public void run() {
             BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
-            while(true) {
+            while (true) {
                 try {
-                    if(r.readLine().equals("stop")) {
+                    if (r.readLine().equals("stop")) {
+                        System.out.println(QCoreApplication.translate("Server", "Shutting down"));
                         QCoreApplication.quit();
                         return;
                     }
@@ -34,9 +35,24 @@ public class Server extends QTcpServer {
         }
     }
 
-    public Server(QHostAddress address, int port) {
+    public Server(QSettings settings) {
+        settings.beginGroup("server");
+        Object address = settings.value("ip"), port = settings.value("port");
+        settings.endGroup();
+
+        if(!QVariant.canConvertToString(address)) {
+            System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/ip", "String"));
+            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/ip", "localhost"));
+            address = "localhost";
+        }
+        if (!QVariant.canConvertToInt(port)){
+            System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/port", "int"));
+            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/port", "0"));
+            port = 0;
+        }
+
         newConnection.connect(this, "establishConnection()");
-        listen(address, port);
+        listen(new QHostAddress(QVariant.toString(address)), QVariant.toInt(port));
     }
 
     public void establishConnection() {
@@ -65,9 +81,9 @@ public class Server extends QTcpServer {
         String jarPath = dir();
         QDir.setCurrent(jarPath);
         QSettings.setPath(QSettings.Format.IniFormat, QSettings.Scope.UserScope, jarPath);
-        
+
         if (!QFile.exists("mm13server.ini")) {
-            System.out.println(QApplication.translate("Server", "Couldn't find configuration."));
+            System.out.println(QCoreApplication.translate("Server", "Couldn't find configuration."));
             QSettings settings = new QSettings("mm13server.ini", QSettings.Format.IniFormat);
 
             settings.beginGroup("server");
@@ -87,11 +103,10 @@ public class Server extends QTcpServer {
         }
 
         QSettings settings = new QSettings("mm13server.ini", QSettings.Format.IniFormat);
-        Server s = new Server(new QHostAddress(settings.value("server-ip", "localhost").toString()),
-                Integer.parseInt(settings.value("server-port", "0").toString()));
+        Server s = new Server(settings);
 
         (new InputThread()).start();
-        
-        QCoreApplication.exec(); //No way of quitting
+
+        QCoreApplication.exec();
     }
 }
