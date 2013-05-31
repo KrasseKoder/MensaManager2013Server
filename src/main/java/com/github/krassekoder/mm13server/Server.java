@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,8 @@ public class Server extends QTcpServer {
         }
     }
 
+    private ArrayList<Connection> connections;
+
     public Server(QSettings settings) {
         settings.beginGroup("server");
         Object address = settings.value("ip"), port = settings.value("port");
@@ -51,11 +54,14 @@ public class Server extends QTcpServer {
             port = 0;
         }
 
+        connections = new ArrayList<Connection>();
+
         newConnection.connect(this, "establishConnection()");
         listen(new QHostAddress(QVariant.toString(address)), QVariant.toInt(port));
     }
 
     public void establishConnection() {
+        connections.add(new Connection(nextPendingConnection()));
     }
 
     public static String dir() throws URISyntaxException {
