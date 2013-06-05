@@ -48,7 +48,7 @@ public class Server extends QTcpServer {
     }
 
     private QHostAddress getAdress(QSettings s) {
-        Object address = s.value("ip", "localhost");
+        Object address = s.value("ip");
         if(!QVariant.canConvertToString(address)) {
             System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/ip", "String"));
             System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/ip", "localhost"));
@@ -58,10 +58,10 @@ public class Server extends QTcpServer {
     }
 
     private int getPort(QSettings s) {
-        Object port = s.value("port", 1996);
+        Object port = s.value("port");
         if (!QVariant.canConvertToInt(port)){
             System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/port", "int"));
-            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/port", "0"));
+            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/port", "1996"));
             return 1996;
         }
         return QVariant.toInt(port);
