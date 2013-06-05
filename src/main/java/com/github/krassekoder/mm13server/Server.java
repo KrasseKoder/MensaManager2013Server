@@ -24,7 +24,7 @@ public class Server extends QTcpServer {
             BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
                 try {
-                    if (r.readLine().equals("stop")) {
+                    if (r.readLine().toLowerCase().equals("stop")) {
                         System.out.println(QCoreApplication.translate("Server", "Shutting down"));
                         QCoreApplication.quit();
                         return;
@@ -94,11 +94,11 @@ public class Server extends QTcpServer {
 
             settings.beginGroup("server");
             settings.setValue("ip", "localhost");
-            settings.setValue("port", 0);
+            settings.setValue("port", 1996);
             settings.endGroup();
 
             settings.beginGroup("database");
-            settings.setValue("host", "db");
+            settings.setValue("host", "mm13.db");
             settings.setValue("driver", "SQLITE");
             settings.setValue("user", "admin");
             settings.setValue("password", "");
