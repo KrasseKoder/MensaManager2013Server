@@ -39,25 +39,32 @@ public class Server extends QTcpServer {
     private ArrayList<Connection> connections;
 
     public Server(QSettings settings) {
-        settings.beginGroup("server");
-        Object address = settings.value("ip"), port = settings.value("port");
-        settings.endGroup();
-
-        if(!QVariant.canConvertToString(address)) {
-            System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/ip", "String"));
-            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/ip", "localhost"));
-            address = "localhost";
-        }
-        if (!QVariant.canConvertToInt(port)){
-            System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/port", "int"));
-            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/port", "0"));
-            port = 0;
-        }
-
         connections = new ArrayList<Connection>();
 
         newConnection.connect(this, "establishConnection()");
-        listen(new QHostAddress(QVariant.toString(address)), QVariant.toInt(port));
+        settings.beginGroup("server");
+        listen(getAdress(settings), getPort(settings));
+        settings.endGroup();
+    }
+
+    private QHostAddress getAdress(QSettings s) {
+        Object address = s.value("ip", "localhost");
+        if(!QVariant.canConvertToString(address)) {
+            System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/ip", "String"));
+            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/ip", "localhost"));
+            return new QHostAddress(QHostAddress.SpecialAddress.LocalHost);
+        }
+        return new QHostAddress(QVariant.toString(address));
+    }
+
+    private int getPort(QSettings s) {
+        Object port = s.value("port", 1996);
+        if (!QVariant.canConvertToInt(port)){
+            System.out.println(String.format(tr("Invalid value for %1$s, should be %2$s!"), "server/port", "int"));
+            System.out.println(String.format(tr("Using default value for %1$s: %2$s!"), "server/port", "0"));
+            return 1996;
+        }
+        return QVariant.toInt(port);
     }
 
     public void establishConnection() {
