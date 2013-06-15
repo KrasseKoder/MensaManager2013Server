@@ -18,25 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server extends QTcpServer {
-
-    public static class InputThread extends Thread {
-        @Override
-        public void run() {
-            BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
-            while (true) {
-                try {
-                    if (r.readLine().toLowerCase().equals("stop")) {
-                        System.out.println(QCoreApplication.translate("Server", "Shutting down"));
-                        QCoreApplication.quit();
-                        return;
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
     private ArrayList<Connection> connections;
 
     public Server(QSettings settings) {
@@ -70,17 +51,5 @@ public class Server extends QTcpServer {
 
     public void establishConnection() {
         connections.add(new Connection(nextPendingConnection()));
-    }
-
-    public static String dir() throws URISyntaxException {
-        URI path = Server.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-        String name = Server.class.getPackage().getName() + ".jar";
-        String path2 = path.getRawPath();
-        path2 = path2.substring(1);
-
-        if (path2.contains(".jar")) {
-            path2 = path2.replace(name, "");
-        }
-        return path2;
     }
 }
