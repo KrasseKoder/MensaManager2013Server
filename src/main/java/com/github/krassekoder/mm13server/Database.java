@@ -8,6 +8,7 @@ import com.trolltech.qt.sql.QSqlDatabase;
 public class Database extends QSqlDatabase{
 
     public Database(QSettings settings) {
+
     }
 
     private String getHost(QSettings s) {

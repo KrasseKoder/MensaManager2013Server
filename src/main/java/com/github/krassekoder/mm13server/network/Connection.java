@@ -1,4 +1,4 @@
-package com.github.krassekoder.mm13server;
+package com.github.krassekoder.mm13server.network;
 
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.network.QTcpSocket;
@@ -13,6 +13,6 @@ public class Connection extends QObject{
     }
 
     public void processBytes() {
-        
+
     }
 }

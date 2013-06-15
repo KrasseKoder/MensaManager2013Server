@@ -1,5 +1,6 @@
-package com.github.krassekoder.mm13server;
+package com.github.krassekoder.mm13server.network;
 
+import com.github.krassekoder.mm13server.network.Connection;
 import com.trolltech.qt.QVariant;
 import com.trolltech.qt.core.QCoreApplication;
 import com.trolltech.qt.core.QDir;
@@ -81,45 +82,5 @@ public class Server extends QTcpServer {
             path2 = path2.replace(name, "");
         }
         return path2;
-    }
-
-    public static void main(String[] args) throws URISyntaxException {
-        QCoreApplication a = new QCoreApplication(args);
-
-        QCoreApplication.setApplicationName("MensaManager2013Server");
-        QCoreApplication.setApplicationVersion("Pre-Alpha");
-        QCoreApplication.setOrganizationName("KrasseKoder");
-        QCoreApplication.setOrganizationDomain("http://www.github.com/KrasseKoder/");
-
-        String jarPath = dir();
-        QDir.setCurrent(jarPath);
-        QSettings.setPath(QSettings.Format.IniFormat, QSettings.Scope.UserScope, jarPath);
-
-        if (!QFile.exists("mm13server.ini")) {
-            System.out.println(QCoreApplication.translate("Server", "Couldn't find configuration."));
-            QSettings settings = new QSettings("mm13server.ini", QSettings.Format.IniFormat);
-
-            settings.beginGroup("server");
-            settings.setValue("ip", "localhost");
-            settings.setValue("port", 1996);
-            settings.endGroup();
-
-            settings.beginGroup("database");
-            settings.setValue("host", "mm13.db");
-            settings.setValue("driver", "SQLITE");
-            settings.setValue("user", "admin");
-            settings.setValue("password", "");
-            settings.endGroup();
-
-            settings.sync();
-            return;
-        }
-
-        QSettings settings = new QSettings("mm13server.ini", QSettings.Format.IniFormat);
-        Server s = new Server(settings);
-
-        (new InputThread()).start();
-
-        QCoreApplication.exec();
     }
 }
