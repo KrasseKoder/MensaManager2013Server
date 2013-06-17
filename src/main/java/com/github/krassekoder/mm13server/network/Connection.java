@@ -2,17 +2,26 @@ package com.github.krassekoder.mm13server.network;
 
 import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.network.QTcpSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Connection extends QObject{
 
-    QTcpSocket socket;
+    /*package*/ QTcpSocket socket;
 
     public Connection(QTcpSocket socket) {
         this.socket = socket;
         socket.readyRead.connect(this, "processBytes()");
+        System.out.println(socket + " connected");
     }
 
     public void processBytes() {
-
+        try {
+            Packet.receive(socket);
+        } catch (Packet.InvalidPacketException ex) {
+            Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Packet.TimeoutException ex) {
+            Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
