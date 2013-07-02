@@ -7,17 +7,21 @@ import java.util.logging.Logger;
 
 public class Connection extends QObject{
 
-    /*package*/ QTcpSocket socket;
+    /*package*/ final QTcpSocket socket;
+    Packet.PacketHandler handler;
+
+    public Signal0 readyRead = new Signal0();
 
     public Connection(QTcpSocket socket) {
         this.socket = socket;
+        handler = new Packet.PacketHandler(this);
         socket.readyRead.connect(this, "processBytes()");
         System.out.println(socket + " connected");
     }
 
     public void processBytes() {
         try {
-            Packet.receive(socket);
+            handler.distribute();
         } catch (Packet.InvalidPacketException ex) {
             Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Packet.TimeoutException ex) {
