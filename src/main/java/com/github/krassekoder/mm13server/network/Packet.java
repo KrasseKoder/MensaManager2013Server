@@ -23,6 +23,7 @@ public abstract class Packet extends QtJambiObject{
         public PacketHandler(Connection c) {
             this.c = c;
             //initialize packets here
+            packets[0] = new Packet0Login(c);
         }
 
         public Packet getById(byte id) {

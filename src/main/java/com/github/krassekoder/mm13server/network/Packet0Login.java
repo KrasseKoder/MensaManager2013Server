@@ -1,9 +1,18 @@
 package com.github.krassekoder.mm13server.network;
 
+import com.github.krassekoder.mm13server.Database;
+import com.trolltech.qt.core.QByteArray;
+
 public class Packet0Login extends Packet{
 
-    private int uNameLen = -1, pwdLen = -1;
-    private String uName, pwd;
+    private enum State {
+        UsernameLength, PasswordLength, Username, Password, LoggedIn
+    }
+
+    private int usernameLength, passwordLength;
+    private String username, password;
+    private State state = State.UsernameLength;
+    /*package*/ byte rights = 0;
 
     public Packet0Login(Connection c) {
         super(c);
@@ -16,27 +25,38 @@ public class Packet0Login extends Packet{
 
     @Override
     protected boolean receiveData() throws InvalidPacketException, TimeoutException {
-        if(uNameLen == -1)
-            if(socket.bytesAvailable() >= 4) //int
-                uNameLen = data.readInt();
-            else
-                return false;
-        if(pwdLen == -1)
-            if(socket.bytesAvailable() >= 4) //int
-                pwdLen = data.readInt();
-            else
-                return false;
-        if(uNameLen != -2) //reading username
-            if(socket.bytesAvailable() >= uNameLen)
-                uName = socket.read(uNameLen).toString();
-            else
-                return false;
-        else //reading password
-            if(socket.bytesAvailable() >= pwdLen)
-                pwd = socket.read(pwdLen).toString();
-            else
-                return false;
-        uNameLen = pwdLen = 0;
+        switch(state) {
+            case UsernameLength:
+                if(socket.bytesAvailable() < 4) //int
+                    return false;
+                usernameLength = data.readInt();
+                state = State.PasswordLength;
+            case PasswordLength:
+                if(socket.bytesAvailable() < 4) //int
+                    return false;
+                passwordLength = data.readInt();
+                state = State.Username;
+            case Username:
+                if(socket.bytesAvailable() < usernameLength)
+                    return false;
+                username = socket.read(usernameLength).toString();
+                state = State.Password;
+            case Password:
+                if(socket.bytesAvailable() < passwordLength)
+                    return false;
+                password = socket.read(passwordLength).toString();
+                state = State.LoggedIn;
+        }
+
+        QByteArray res = new QByteArray();
+        res.append(rights = 0/*Database.hasUser(username, password)*/);
+        sendData(res);
+
+        if(rights > 0)
+            System.out.println(username + " logged in");
+        else
+            System.out.println("Failed to log in as " + username);
+
         return true;
     }
 

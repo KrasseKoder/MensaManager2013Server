@@ -14,12 +14,13 @@ public class Connection extends QObject{
 
     public Connection(QTcpSocket socket) {
         this.socket = socket;
+        socket.error.connect(this, "error()");
         handler = new Packet.PacketHandler(this);
         socket.readyRead.connect(this, "processBytes()");
         System.out.println(socket + " connected");
     }
 
-    public void processBytes() {
+    private void processBytes() {
         try {
             handler.distribute();
         } catch (Packet.InvalidPacketException ex) {
@@ -27,5 +28,9 @@ public class Connection extends QObject{
         } catch (Packet.TimeoutException ex) {
             Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void error() {
+        System.out.println(socket.errorString());
     }
 }
