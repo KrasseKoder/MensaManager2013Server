@@ -1,7 +1,6 @@
 package com.github.krassekoder.mm13server;
 
 import com.github.krassekoder.mm13server.network.Server;
-import com.trolltech.qt.QVariant;
 import com.trolltech.qt.core.QCoreApplication;
 import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QSettings;
@@ -16,7 +15,6 @@ import java.util.logging.Logger;
 public class Main {
 
     public static class InputThread extends Thread {
-
         @Override
         public void run() {
             BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
@@ -24,6 +22,7 @@ public class Main {
                 try {
                     if(r.readLine().toLowerCase().equals("stop")) {
                         System.out.println(QCoreApplication.translate("Server", "Shutting down"));
+                        Database.save();
                         QCoreApplication.quit();
                         return;
                     }
@@ -49,47 +48,12 @@ public class Main {
     }
 
     private static QSettings prepareSettings() {
+        System.out.println("Preparing Settings: " + (new QDir()).absoluteFilePath("mm13server.ini"));
         QSettings settings = new QSettings("mm13server.ini", QSettings.Format.IniFormat);
 
         settings.beginGroup("server");
-        //string ip = "localhost"
         settings.setValue("ip", settings.value("ip", "localhost"));
-        if(!QVariant.canConvertToString(settings.value("ip"))) {
-            settings.setValue("ip", "localhost");
-        }
-        //int port = 1996
         settings.setValue("port", settings.value("port", 1996));
-        if(!QVariant.canConvertToInt(settings.value("port"))) {
-            settings.setValue("ip", 1996);
-        }
-        settings.endGroup();
-
-        settings.beginGroup("database");
-        //string driver = SQLITE
-        settings.setValue("driver", settings.value("driver", "SQLITE"));
-        if(!QVariant.canConvertToString(settings.value("driver"))) {
-            settings.setValue("driver", "SQLITE");
-        }
-        //string host =
-        settings.setValue("host", settings.value("host", ""));
-        if(!QVariant.canConvertToString(settings.value("host"))) {
-            settings.setValue("host", "");
-        }
-        //string name = mm13.db
-        settings.setValue("name", settings.value("name", "mm13.db"));
-        if(!QVariant.canConvertToString(settings.value("name"))) {
-            settings.setValue("name", "mm13.db");
-        }
-        //string user = admin
-        settings.setValue("user", settings.value("user", "admin"));
-        if(!QVariant.canConvertToString(settings.value("user"))) {
-            settings.setValue("user", "admin");
-        }
-        //string password =
-        settings.setValue("password", settings.value("password", ""));
-        if(!QVariant.canConvertToString(settings.value("password"))) {
-            settings.setValue("password", "");
-        }
         settings.endGroup();
 
         settings.sync();
@@ -107,9 +71,8 @@ public class Main {
         preparePaths();
 
         QSettings settings = prepareSettings();
-
+        Database.init();
         Server s = new Server(settings);
-        Database.init(settings);
 
         (new InputThread()).start();
 

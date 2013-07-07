@@ -49,7 +49,7 @@ public class Packet0Login extends Packet{
         }
 
         QByteArray res = new QByteArray();
-        res.append(rights = 0/*Database.hasUser(username, password)*/);
+        res.append(rights = Database.hasUser(username, password));
         sendData(res);
 
         if(rights > 0)
