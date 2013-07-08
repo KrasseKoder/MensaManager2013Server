@@ -57,7 +57,17 @@ public final class Database {
         StringBuilder res = new StringBuilder();
         for(int i = 0; i < meals.length(); i++) {
             if(meals.at(i).isElement()) {
-                if(meals.at(i).toElement().attribute("id").startsWith(request) ||
+                if(meals.at(i).toElement().attribute("id").matches(request)) {
+                    StringBuilder buffer = res;
+                    res = new StringBuilder();
+                    res.append(meals.at(i).toElement().attribute("id"));
+                    res.append("\n");
+                    res.append(meals.at(i).toElement().attribute("name"));
+                    res.append("\n");
+                    res.append(meals.at(i).toElement().attribute("price"));
+                    res.append("\n\n");
+                    res.append(buffer);
+                } else if(meals.at(i).toElement().attribute("id").startsWith(request) ||
                    meals.at(i).toElement().attribute("name").contains(request)) {
                         res.append(meals.at(i).toElement().attribute("id"));
                         res.append("\n");

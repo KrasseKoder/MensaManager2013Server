@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mm13server>
     <users>
-        <user name="admin" password="12345" rights="1"/>
+        <user name="admin" password="12345" rights="2"/>
     </users>
     <products>
         <!--<product id="1" name="DisplayName" price="1.11"/>-->
