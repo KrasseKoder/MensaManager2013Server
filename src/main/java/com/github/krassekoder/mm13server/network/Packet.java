@@ -24,6 +24,7 @@ public abstract class Packet extends QtJambiObject{
             this.c = c;
             //initialize packets here
             packets[0] = new Packet0Login(c);
+            packets[1] = new Packet1FoodList(c);
         }
 
         public Packet getById(byte id) {

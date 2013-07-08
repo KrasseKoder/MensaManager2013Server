@@ -51,4 +51,23 @@ public final class Database {
         }
         return 0;
     }
+
+    public static String getMeals(String request) {
+        QDomNodeList meals = db.documentElement().firstChildElement("products").childNodes();
+        StringBuilder res = new StringBuilder();
+        for(int i = 0; i < meals.length(); i++) {
+            if(meals.at(i).isElement()) {
+                if(meals.at(i).toElement().attribute("id").startsWith(request) ||
+                   meals.at(i).toElement().attribute("name").contains(request)) {
+                        res.append(meals.at(i).toElement().attribute("id"));
+                        res.append("\n");
+                        res.append(meals.at(i).toElement().attribute("name"));
+                        res.append("\n");
+                        res.append(meals.at(i).toElement().attribute("price"));
+                        res.append("\n\n");
+                }
+            }
+        }
+        return res.toString();
+    }
 }

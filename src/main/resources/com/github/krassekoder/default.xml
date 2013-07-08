@@ -3,4 +3,7 @@
     <users>
         <user name="admin" password="12345" rights="1"/>
     </users>
+    <products>
+        <!--<product id="1" name="DisplayName" price="1.11"/>-->
+    </products>
 </mm13server>
