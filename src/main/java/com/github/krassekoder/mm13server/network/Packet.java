@@ -25,6 +25,7 @@ public abstract class Packet extends QtJambiObject{
             //initialize packets here
             packets[0] = new Packet0Login(c);
             packets[1] = new Packet1FoodList(c);
+            packets[2] = new Packet2EntryEdit(c);
         }
 
         public Packet getById(byte id) {
@@ -48,9 +49,11 @@ public abstract class Packet extends QtJambiObject{
     }
 
     protected QTcpSocket socket;
+    protected Connection connection;
     protected QDataStream data;
 
     public Packet(Connection c) {
+        connection = c;
         socket = c.socket;
         data = new QDataStream(socket);
     }

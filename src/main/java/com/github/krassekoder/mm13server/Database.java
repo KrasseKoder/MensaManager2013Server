@@ -4,6 +4,7 @@ import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QFile;
 import com.trolltech.qt.core.QTextStream;
 import com.trolltech.qt.xml.QDomDocument;
+import com.trolltech.qt.xml.QDomElement;
 import com.trolltech.qt.xml.QDomNodeList;
 
 public final class Database {
@@ -79,5 +80,36 @@ public final class Database {
             }
         }
         return res.toString();
+    }
+
+    private static QDomElement findMeal(String id){
+        QDomNodeList meals = db.documentElement().firstChildElement("products").childNodes();
+        for(int i = 0; i < meals.length(); i++) {
+            if(meals.at(i).isElement() && meals.at(i).toElement().attribute("id").equals(id)) {
+                return meals.at(i).toElement();
+            }
+        }
+        return null;
+    }
+
+    public static void editMeal(String id, String name, String price) {
+       QDomElement e = findMeal(id);
+
+       if(name.isEmpty()) {
+           if(e != null)
+                e.parentNode().removeChild(e);
+           else
+               return;
+       }
+
+       if(e == null) {
+           e = new QDomElement();
+           e.setTagName("product");
+           e.setAttribute("id", id);
+           db.documentElement().firstChildElement("products").appendChild(e);
+       }
+
+       e.setAttribute("name", name);
+       e.setAttribute("price", price);
     }
 }

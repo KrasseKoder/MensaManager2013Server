@@ -10,7 +10,7 @@ public class Packet0Login extends Packet{
     }
 
     private int usernameLength, passwordLength;
-    private String username, password;
+    /*packet*/ String username, password;
     private State state = State.UsernameLength;
     /*package*/ byte rights = 0;
 

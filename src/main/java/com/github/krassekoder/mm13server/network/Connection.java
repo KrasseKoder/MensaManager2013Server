@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class Connection extends QObject{
 
     /*package*/ final QTcpSocket socket;
-    Packet.PacketHandler handler;
+    /*package*/ Packet.PacketHandler handler;
 
     public Signal0 readyRead = new Signal0();
 
