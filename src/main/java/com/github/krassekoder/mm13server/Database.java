@@ -39,7 +39,7 @@ public final class Database {
     }
 
 
-    public static byte hasUser(String username, String password) {
+    public static byte login(String username, String password) {
         QDomNodeList users = db.documentElement().firstChildElement("users").elementsByTagName("user");
         for(int i = 0; i < users.length(); i++) {
             if(users.at(i).toElement().attribute("name").equals(username)) {
@@ -49,6 +49,36 @@ public final class Database {
             }
         }
         return 0;
+    }
+
+    private static QDomElement findUser(String name) {
+        QDomNodeList meals = db.documentElement().firstChildElement("users").elementsByTagName("user");
+        for(int i = 0; i < meals.length(); i++) {
+            if(meals.at(i).toElement().attribute("name").equals(name)) {
+                return meals.at(i).toElement();
+            }
+        }
+        return null;
+    }
+
+    public static void editUser(String name, String password, String rights) {
+       QDomElement e = findUser(name);
+
+       if(rights.equals("0")) {
+           if(e != null)
+                e.parentNode().removeChild(e);
+           else
+               return;
+       }
+
+       if(e == null) {
+           e = db.createElement("user");
+           e.setAttribute("name", name);
+           db.documentElement().firstChildElement("users").appendChild(e);
+       }
+
+       e.setAttribute("password", password);
+       e.setAttribute("rights", rights);
     }
 
     public static String getProducts(String request) {

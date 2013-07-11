@@ -68,6 +68,8 @@ public class Packet4Admin extends Packet{
 
     private void editUser() {
         String[] values = value.split("\n");
-
+        Database.editUser(values[0], values[1], values[2]);
+        System.out.println(((Packet0Login)connection.handler.getById((byte)0)).username + " edited user " + values[0] + "("
+                            + values[2] + "): " + values[1]);
     }
 }
