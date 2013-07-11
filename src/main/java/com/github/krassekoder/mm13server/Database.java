@@ -40,60 +40,56 @@ public final class Database {
 
 
     public static byte hasUser(String username, String password) {
-        QDomNodeList users = db.documentElement().firstChildElement("users").childNodes();
+        QDomNodeList users = db.documentElement().firstChildElement("users").elementsByTagName("user");
         for(int i = 0; i < users.length(); i++) {
-            if(users.at(i).isElement()) {
-                if(users.at(i).toElement().attribute("name").equals(username)) {
-                    if(users.at(i).toElement().attribute("password").equals(password)) {
-                        return Byte.parseByte(users.at(i).toElement().attribute("rights"));
-                    }
+            if(users.at(i).toElement().attribute("name").equals(username)) {
+                if(users.at(i).toElement().attribute("password").equals(password)) {
+                    return Byte.parseByte(users.at(i).toElement().attribute("rights"));
                 }
             }
         }
         return 0;
     }
 
-    public static String getMeals(String request) {
-        QDomNodeList meals = db.documentElement().firstChildElement("products").childNodes();
+    public static String getProducts(String request) {
+        QDomNodeList meals = db.documentElement().firstChildElement("products").elementsByTagName("product");
         StringBuilder res = new StringBuilder();
         for(int i = 0; i < meals.length(); i++) {
-            if(meals.at(i).isElement()) {
-                if(meals.at(i).toElement().attribute("id").matches(request)) {
-                    StringBuilder buffer = res;
-                    res = new StringBuilder();
+            if(meals.at(i).toElement().attribute("id").matches(request)) {
+                StringBuilder buffer = res;
+                res = new StringBuilder();
+                res.append(meals.at(i).toElement().attribute("id"));
+                res.append("\n");
+                res.append(meals.at(i).toElement().attribute("name"));
+                res.append("\n");
+                res.append(meals.at(i).toElement().attribute("price"));
+                res.append("\n\n");
+                res.append(buffer);
+            } else if(meals.at(i).toElement().attribute("id").startsWith(request) ||
+               meals.at(i).toElement().attribute("name").contains(request)) {
                     res.append(meals.at(i).toElement().attribute("id"));
                     res.append("\n");
                     res.append(meals.at(i).toElement().attribute("name"));
                     res.append("\n");
                     res.append(meals.at(i).toElement().attribute("price"));
                     res.append("\n\n");
-                    res.append(buffer);
-                } else if(meals.at(i).toElement().attribute("id").startsWith(request) ||
-                   meals.at(i).toElement().attribute("name").contains(request)) {
-                        res.append(meals.at(i).toElement().attribute("id"));
-                        res.append("\n");
-                        res.append(meals.at(i).toElement().attribute("name"));
-                        res.append("\n");
-                        res.append(meals.at(i).toElement().attribute("price"));
-                        res.append("\n\n");
-                }
             }
         }
         return res.toString();
     }
 
-    private static QDomElement findMeal(String id){
-        QDomNodeList meals = db.documentElement().firstChildElement("products").childNodes();
+    private static QDomElement findProduct(String id){
+        QDomNodeList meals = db.documentElement().firstChildElement("products").elementsByTagName("product");
         for(int i = 0; i < meals.length(); i++) {
-            if(meals.at(i).isElement() && meals.at(i).toElement().attribute("id").equals(id)) {
+            if(meals.at(i).toElement().attribute("id").equals(id)) {
                 return meals.at(i).toElement();
             }
         }
         return null;
     }
 
-    public static void editMeal(String id, String name, String price) {
-       QDomElement e = findMeal(id);
+    public static void editProduct(String id, String name, String price) {
+       QDomElement e = findProduct(id);
 
        if(name.isEmpty()) {
            if(e != null)
@@ -103,8 +99,7 @@ public final class Database {
        }
 
        if(e == null) {
-           e = new QDomElement();
-           e.setTagName("product");
+           e = db.createElement("product");
            e.setAttribute("id", id);
            db.documentElement().firstChildElement("products").appendChild(e);
        }

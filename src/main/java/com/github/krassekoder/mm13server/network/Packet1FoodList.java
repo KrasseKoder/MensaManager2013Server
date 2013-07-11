@@ -37,7 +37,7 @@ public class Packet1FoodList extends Packet{
                 request = socket.read(length).toString();
         }
 
-        QByteArray meals = new QByteArray(Database.getMeals(request));
+        QByteArray meals = new QByteArray(Database.getProducts(request));
 
         QByteArray res = new QByteArray();
         QDataStream s = new QDataStream(res, QIODevice.OpenModeFlag.WriteOnly);
