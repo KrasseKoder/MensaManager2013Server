@@ -96,7 +96,7 @@ public final class Database {
                 res.append("\n\n");
                 res.append(buffer);
             } else if(meals.at(i).toElement().attribute("id").startsWith(request) ||
-               meals.at(i).toElement().attribute("name").contains(request)) {
+               meals.at(i).toElement().attribute("name").toLowerCase().contains(request.toLowerCase())) {
                     res.append(meals.at(i).toElement().attribute("id"));
                     res.append("\n");
                     res.append(meals.at(i).toElement().attribute("name"));
