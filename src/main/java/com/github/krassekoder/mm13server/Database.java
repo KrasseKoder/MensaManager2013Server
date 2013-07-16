@@ -1,5 +1,6 @@
 package com.github.krassekoder.mm13server;
 
+import com.trolltech.qt.core.QDateTime;
 import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QFile;
 import com.trolltech.qt.core.QTextStream;
@@ -8,6 +9,7 @@ import com.trolltech.qt.xml.QDomElement;
 import com.trolltech.qt.xml.QDomNodeList;
 
 public final class Database {
+
     private static QDomDocument db;
 
     private static void newDb() {
@@ -136,5 +138,61 @@ public final class Database {
 
        e.setAttribute("name", name);
        e.setAttribute("price", price);
+    }
+
+    private static QDomElement getSale(String input) {
+        String[] items = input.split("\n");
+
+        QDomElement e = db.createElement("sale");
+        db.documentElement().firstChildElement("sales").appendChild(e);
+
+        e.setAttribute("type", items[0]);
+        e.setAttribute("date", QDateTime.currentDateTime().toString());
+        if(items.length >= 2)
+            e.setAttribute("data1", items[1]);
+        if(items.length >= 3)
+            e.setAttribute("data2", items[2]);
+
+        return e;
+    }
+
+    public static double getPrice(String id) {
+        return Double.parseDouble(findProduct(id).attribute("price"));
+    }
+
+    public static double purchase(String data) {
+        String[] parts = data.split("\n\n");
+        QDomElement e = getSale(parts[0]);
+
+        double sum = 0;
+
+        String[] products = parts[1].split("\n");
+        for(int i = 0; i < products.length; i++) {
+            QDomElement product = db.createElement("product");
+            e.appendChild(product);
+            String[] items = products[i].split("\t");
+            product.setAttribute("id", items[0]);
+            product.setAttribute("count", items[1]);
+            sum += getPrice(items[0]) * Integer.parseInt(items[1]);
+        }
+
+        e.setAttribute("sum", sum);
+
+        if(e.attribute("type").equals("01")) {
+            System.out.println("Sale: Cash(" + e.attribute("data1") + ")");
+            e.setAttribute("money", e.attribute("data1"));
+            sum = Double.parseDouble(e.attribute("data1")) - sum;
+        } else if(e.attribute("type").equals("02")) {
+            System.out.println("Sale: Account(" + e.attribute("data1") + ")");
+            e.setAttribute("user", e.attribute("data1"));
+            //charge user, calc remaining
+        } else if(e.attribute("type").equals("03")) {
+            System.out.println("Sale: Voucher(" + e.attribute("data1") + ")");
+            e.setAttribute("id", e.attribute("data1"));
+            //charge voucher, calc remaining
+        }
+        e.removeAttribute("data1");
+        e.removeAttribute("data2");
+        return sum;
     }
 }

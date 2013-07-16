@@ -25,6 +25,7 @@ public abstract class Packet extends QtJambiObject{
             //initialize packets here
             packets[0] = new Packet0Login(c);
             packets[1] = new Packet1FoodList(c);
+            packets[2] = new Packet2Purchase(c);
             packets[4] = new Packet4Admin(c);
         }
 
