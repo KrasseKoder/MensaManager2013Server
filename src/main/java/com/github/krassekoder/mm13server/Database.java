@@ -149,7 +149,7 @@ public final class Database {
         db.documentElement().firstChildElement("sales").appendChild(e);
 
         e.setAttribute("type", items[0]);
-        e.setAttribute("date", QDateTime.currentDateTime().toString());
+        e.setAttribute("date", QDateTime.currentDateTime().toTime_t());
         if(items.length >= 2)
             e.setAttribute("data1", items[1]);
         if(items.length >= 3)
@@ -251,7 +251,7 @@ public final class Database {
     private static String getSales() {
         QDomNodeList sales = db.documentElement().firstChildElement("sales").elementsByTagName("sale");
         StringBuilder b = new StringBuilder();
-        
+
         if(sales.length() > 0) {
             b.append(sales.at(0).toElement().attribute("date"));
             b.append("\t");
