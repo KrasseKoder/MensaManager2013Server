@@ -2,12 +2,16 @@ package com.github.krassekoder.mm13server.network;
 
 import com.github.krassekoder.mm13server.Database;
 import com.trolltech.qt.core.QByteArray;
+import com.trolltech.qt.core.QDataStream;
+import com.trolltech.qt.core.QIODevice;
 
 public class Packet4Admin extends Packet{
 
     public enum State {
         Type, Length, Data
     }
+
+    private static final int PRODUCT = 0, USER = 1, VOUCHER = 2;
 
     private byte type;
     private int length;
@@ -41,35 +45,46 @@ public class Packet4Admin extends Packet{
                     return false;
                 value = socket.read(length).toString();
         }
-
-        if(((Packet0Login)connection.handler.getById((byte)0)).rights < 2) {
-            System.out.println(((Packet0Login)connection.handler.getById((byte)0)).username + " tried editing the database.");
-            sendData(new QByteArray());
-            return true;
-        }
-
-        if(type == 0)
-            editProduct();
-        else if(type == 1)
-            editUser();
-
-        sendData(new QByteArray());
-
         state = State.Type;
+
+        if(type == PRODUCT)
+            editProduct();
+        else if(type == USER)
+            editUser();
+        else if(type == VOUCHER)
+            addVoucher();
+
         return true;
     }
 
     private void editProduct() {
-        String[] values = value.split("\n");
-        Database.editProduct(values[0], values[1], values[2]);
-        System.out.println(((Packet0Login)connection.handler.getById((byte)0)).username + " edited product " + values[0] + ": "
-                            + values[1] + " " + values[2]);
+        if(((Packet0Login)connection.handler.getById((byte)0)).ensureRights(Packet0Login.ADMIN)) {
+            String[] values = value.split("\n");
+            Database.editProduct(values[0], values[1], values[2]);
+            System.out.println(((Packet0Login)connection.handler.getById((byte)0)).username + " edited product " + values[0] + ": "
+                                + values[1] + " " + values[2]);
+        } else { System.out.println("Tried editing the database"); }
+        sendData(new QByteArray());
     }
 
     private void editUser() {
-        String[] values = value.split("\n");
-        Database.editUser(values[0], values[1], values[2]);
-        System.out.println(((Packet0Login)connection.handler.getById((byte)0)).username + " edited user " + values[0] + "("
-                            + values[2] + "): " + values[1]);
+        if(((Packet0Login)connection.handler.getById((byte)0)).ensureRights(Packet0Login.ADMIN)) {
+            String[] values = value.split("\n");
+            Database.editUser(values[0], values[1], values[2]);
+            System.out.println(((Packet0Login)connection.handler.getById((byte)0)).username + " edited user " + values[0] + "("
+                                + values[2] + "): " + values[1]);
+        } else { System.out.println("Tried editing the database"); }
+        sendData(new QByteArray());
+    }
+
+    private void addVoucher() {
+        QByteArray res = new QByteArray();
+        QDataStream s = new QDataStream(res, QIODevice.OpenModeFlag.WriteOnly);
+        if(((Packet0Login)connection.handler.getById((byte)0)).ensureRights(Packet0Login.TELLER)) {
+            QByteArray v = new QByteArray(Database.addVoucher(value));
+            s.writeInt(v.length());
+            res.append(v);
+        } else { System.out.println("Tried creating a voucher"); s.writeInt(0); }
+        sendData(res);
     }
 }

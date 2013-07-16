@@ -3,6 +3,7 @@ package com.github.krassekoder.mm13server;
 import com.github.krassekoder.mm13server.network.Server;
 import com.trolltech.qt.core.QCoreApplication;
 import com.trolltech.qt.core.QDir;
+import com.trolltech.qt.core.QLocale;
 import com.trolltech.qt.core.QSettings;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class Main {
         QCoreApplication.setApplicationVersion("Pre-Alpha");
         QCoreApplication.setOrganizationName("KrasseKoder");
         QCoreApplication.setOrganizationDomain("http://www.github.com/KrasseKoder/");
+        QLocale.setDefault(new QLocale(QLocale.Language.English, QLocale.Country.UnitedStates));
 
         preparePaths();
 

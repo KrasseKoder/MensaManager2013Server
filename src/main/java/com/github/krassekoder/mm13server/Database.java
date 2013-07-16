@@ -7,6 +7,7 @@ import com.trolltech.qt.core.QTextStream;
 import com.trolltech.qt.xml.QDomDocument;
 import com.trolltech.qt.xml.QDomElement;
 import com.trolltech.qt.xml.QDomNodeList;
+import java.util.UUID;
 
 public final class Database {
 
@@ -189,10 +190,52 @@ public final class Database {
         } else if(e.attribute("type").equals("03")) {
             System.out.println("Sale: Voucher(" + e.attribute("data1") + ")");
             e.setAttribute("id", e.attribute("data1"));
-            //charge voucher, calc remaining
+            double newsum = chargeVoucher(e.attribute("data1"), sum);
+            if(newsum > 0)
+                sum = newsum;
         }
         e.removeAttribute("data1");
         e.removeAttribute("data2");
         return sum;
+    }
+
+    private static QDomElement findVoucher(String id) {
+        QDomNodeList meals = db.documentElement().firstChildElement("vouchers").elementsByTagName("voucher");
+        for(int i = 0; i < meals.length(); i++) {
+            if(meals.at(i).toElement().attribute("id").equals(id)) {
+                return meals.at(i).toElement();
+            }
+        }
+        return null;
+    }
+
+    public static double chargeVoucher(String id, double sum) {
+        QDomElement e = findVoucher(id);
+        if(e == null)
+            return -1;
+
+        double value = Double.parseDouble(e.attribute("value"));
+        if(value < sum) {
+            e.setAttribute("value", "0");
+            return sum - value;
+        } else {
+            e.setAttribute("value", value - sum);
+            return 0;
+        }
+    }
+
+    public static String addVoucher(String value) {
+        String uuid = UUID.randomUUID().toString();
+        while(chargeVoucher(uuid, 0) >= 0)
+            uuid = UUID.randomUUID().toString();
+
+        QDomElement e = db.createElement("voucher");
+        e.setAttribute("voucher-id", uuid);
+        e.setAttribute("value", value);
+        db.documentElement().firstChildElement("vouchers").appendChild(e);
+
+        System.out.println("New Voucher(" + value + "): " + uuid);
+
+        return uuid;
     }
 }

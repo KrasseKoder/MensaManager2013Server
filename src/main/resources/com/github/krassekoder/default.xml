@@ -4,5 +4,6 @@
         <user name="admin" password="12345" rights="2" />
     </users>
     <products />
+    <vouchers />
     <sales />
 </mm13server>

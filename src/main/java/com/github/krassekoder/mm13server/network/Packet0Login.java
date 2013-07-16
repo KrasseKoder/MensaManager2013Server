@@ -9,6 +9,8 @@ public class Packet0Login extends Packet{
         UsernameLength, PasswordLength, Username, Password, LoggedIn
     }
 
+    public static final int TELLER = 1, ADMIN = 2;
+
     private int usernameLength, passwordLength;
     /*packet*/ String username, password;
     private State state = State.UsernameLength;
@@ -60,4 +62,11 @@ public class Packet0Login extends Packet{
         return true;
     }
 
+    public boolean ensureRights(int minimum) {
+        if(rights < minimum){
+            System.out.println(username + " has insufficient rights");
+            return false;
+        }
+        return true;
+    }
 }
