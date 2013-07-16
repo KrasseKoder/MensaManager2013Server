@@ -1,5 +1,6 @@
 package com.github.krassekoder.mm13server;
 
+import com.github.krassekoder.mm13server.network.Packet3Data;
 import com.trolltech.qt.core.QDateTime;
 import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QFile;
@@ -237,5 +238,33 @@ public final class Database {
         System.out.println("New Voucher(" + value + "): " + uuid);
 
         return uuid;
+    }
+
+    public static String composeData(int type) {
+        switch(type) {
+            case Packet3Data.SALES:
+                return getSales();
+        }
+        return "";
+    }
+
+    private static String getSales() {
+        QDomNodeList sales = db.documentElement().firstChildElement("sales").elementsByTagName("sale");
+        StringBuilder b = new StringBuilder();
+        
+        if(sales.length() > 0) {
+            b.append(sales.at(0).toElement().attribute("date"));
+            b.append("\t");
+            b.append(sales.at(0).toElement().attribute("sum"));
+        }
+
+        for(int i = 1; i < sales.length(); i++) {
+            b.append("\n");
+            b.append(sales.at(i).toElement().attribute("date"));
+            b.append("\t");
+            b.append(sales.at(i).toElement().attribute("sum"));
+        }
+
+        return b.toString();
     }
 }
