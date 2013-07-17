@@ -173,9 +173,9 @@ public final class Database {
             QDomElement product = db.createElement("product");
             e.appendChild(product);
             String[] items = products[i].split("\t");
-            product.setAttribute("id", items[0]);
-            product.setAttribute("count", items[1]);
-            sum += getPrice(items[0]) * Integer.parseInt(items[1]);
+            product.setAttribute("count", items[0]);
+            product.setAttribute("id", items[1]);
+            sum += getPrice(items[1]) * Integer.parseInt(items[1]);
         }
 
         e.setAttribute("sum", sum);

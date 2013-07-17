@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +70,7 @@ public class Main {
         QCoreApplication.setOrganizationName("KrasseKoder");
         QCoreApplication.setOrganizationDomain("http://www.github.com/KrasseKoder/");
         QLocale.setDefault(new QLocale(QLocale.Language.English, QLocale.Country.UnitedStates));
+        Locale.setDefault(Locale.ENGLISH);
 
         preparePaths();
 
