@@ -175,7 +175,7 @@ public final class Database {
             String[] items = products[i].split("\t");
             product.setAttribute("count", items[0]);
             product.setAttribute("id", items[1]);
-            sum += getPrice(items[1]) * Integer.parseInt(items[1]);
+            sum += getPrice(items[1]) * Integer.parseInt(items[0]);
         }
 
         e.setAttribute("sum", sum);
